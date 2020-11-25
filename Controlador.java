@@ -242,7 +242,7 @@ public class Controlador
     public void startCalculator(){
         String entry = "";
         
-        while(!"S".equals(entry)){
+        while(!"S".equals(entry.toUpperCase())){
             entry = calculatorMenuControlador();
             
             if(entry != null){
