@@ -9,14 +9,13 @@ import javax.swing.JOptionPane;
 public class Interfaz
 {
     // instance variables - replace the example below with your own
-    private Escritor writer;
 
     /**
      * Constructor for objects of class Interfaz
      */
     public Interfaz()
     {
-        writer = new Escritor("");
+        
     }
 
     /**
@@ -49,9 +48,9 @@ public class Interfaz
         answers[0] = JOptionPane.showInputDialog("Ingrese la primera ecuación: ");
         JOptionPane.showMessageDialog(null, answers[0]);
         answers[1] = JOptionPane.showInputDialog("Ingrese el operando: ");
-        JOptionPane.showMessageDialog(null, answers[0]+answers[1]);
+        JOptionPane.showMessageDialog(null, answers[0]+" | "+answers[1]);
         answers[2] = JOptionPane.showInputDialog("Ingrese la segunda ecuación: ");
-        JOptionPane.showMessageDialog(null, answers[0]+answers[1]+answers[2]);
+        JOptionPane.showMessageDialog(null, answers[0]+" | "+answers[1]+" | "+answers[2]);
         
         return answers;
     }
@@ -92,7 +91,7 @@ public class Interfaz
      * @return    the sum of x and y
      */
     public void deployEquation(String polynomial1, String polynomial2, String operating, String outcome){
-        JOptionPane.showMessageDialog(null, polynomial1+"|"+operating+"|"+polynomial2+"|"+outcome);
+        JOptionPane.showMessageDialog(null, polynomial1+" | "+operating+" | "+polynomial2+" | "+outcome);
     }
     
     
