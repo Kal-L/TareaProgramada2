@@ -11,8 +11,6 @@ public class Modelo
     private ListaEnlazada list1;
     private ListaEnlazada list2;
     private ListaEnlazada temporalList;
-    private Lector reader;
-    private Escritor writer;
     String polynomial1;
     String polynomial2;
     String operating;
@@ -26,8 +24,6 @@ public class Modelo
         list1 = new ListaEnlazada();
         list2 = new ListaEnlazada();
         temporalList = new ListaEnlazada();
-        reader = new Lector("");
-        writer = new Escritor("",false);
         polynomial1 = "";
         polynomial2 = "";
         operating = "";
@@ -92,7 +88,7 @@ public class Modelo
      * @return    the sum of x and y
      */
     public void readFileEquation(String fileName){
-        reader = new Lector(fileName);
+        Lector reader = new Lector(fileName);
         String line = reader.readLine();
         reader.close();
         
@@ -104,22 +100,43 @@ public class Modelo
         String[] split2 = split1[0].split(" ");
         String[] split3 = split1[2].split(" ");
         
-        for(int index = 0; index < split2.length; index++){
-            if(index > 0 && "-".equals(split2[index-1])){
-                String aux = "-"+split2[index];
-                split2[index] = aux;
+        if("+".equals(operating) || "-".equals(operating)){
+            
+            for(int index = 0; index < split2.length; index++){
+                if(index > 0 && "-".equals(split2[index-1])){
+                    String aux = "-"+split2[index];
+                    split2[index] = aux;
+                }
+                list1.addNodeMonomial(split2[index]);
+                index++;
             }
-            list1.addNodeMonomial(split2[index]);
-            index++;
-        }
+            
+            for(int index = 0; index < split3.length; index++){
+                if(index > 0 && "-".equals(split3[index-1])){
+                    String aux = "-"+split3[index];
+                    split3[index] = aux;
+                }
+                list1.addNodeMonomial(split3[index]);
+                index++;
+            }
+        }else{
+            for(int index = 0; index < split2.length; index++){
+                if(index > 0 && "-".equals(split2[index-1])){
+                    String aux = "-"+split2[index];
+                    split2[index] = aux;
+                }
+                list1.addNodeMonomial(split2[index]);
+                index++;
+            }
         
-        for(int index = 0; index < split3.length; index++){
-            if(index > 0 && "-".equals(split3[index-1])){
-                String aux = "-"+split3[index];
-                split3[index] = aux;
+            for(int index = 0; index < split3.length; index++){
+                if(index > 0 && "-".equals(split3[index-1])){
+                    String aux = "-"+split3[index];
+                    split3[index] = aux;
+                }
+                list2.addNodeMonomial(split3[index]);
+                index++;
             }
-            list2.addNodeMonomial(split3[index]);
-            index++;
         }
     }
     
@@ -135,91 +152,82 @@ public class Modelo
             case "+":
                 if(actualNode != null){
                     if(list.getSize() == 1){
-                        if(actualNode.getPower() == list.getFirst().getPower()){
-                            int suma = actualNode.getCoefficient() + list.getFirst().getCoefficient();
-                            outcome += suma+"x^"+actualNode.getPower();
-                            outcome += " ";
-                            outcome += "+";
-                            outcome += " ";
-                        }else{
-                            outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
-                            outcome += " ";
-                            outcome += "+";
-                            outcome += " ";
-                        }
+                        outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
                     }else{
-                        Nodo aux = list.getFirst();
+                        Nodo aux = actualNode.getNext();
                         boolean control = false;
                         while(aux != null){
                             if(actualNode.getPower() == aux.getPower()){
                                 int sum = actualNode.getCoefficient() + aux.getCoefficient();
                                 outcome += sum+"x^"+actualNode.getPower();
-                                outcome += " ";
-                                outcome += "+";
-                                outcome += " ";
+                                if(actualNode.getNext()!=null || aux.getNext()!=null){
+                                    outcome += " ";
+                                    outcome += "+";
+                                    outcome += " ";
+                                }
                                 control = true;
+                                list1.deleteNode(aux);
                             }
                             aux = aux.getNext();
                         }
                         if(!control){
                             outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
-                            outcome += " ";
-                            outcome += "+";
-                            outcome += " ";
+                            if(actualNode.getNext()!=null){
+                                outcome += " ";
+                                outcome += "+";
+                                outcome += " ";
+                            }
                         }
                     }
-                    doOperation(actualNode.getNext(),list,operating);
+                    doOperation(actualNode.getNext(),list1,operating);
                 }
                 break;
                 
             case "-":
                 if(actualNode != null){
                     if(list.getSize() == 1){
-                        if(actualNode.getPower() == list.getFirst().getPower()){
-                            int diference = actualNode.getCoefficient() - list.getFirst().getCoefficient();
-                            outcome += diference+"x^"+actualNode.getPower();
-                            outcome += " ";
-                            outcome += "+";
-                            outcome += " ";
-                        }else{
-                            outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
-                            outcome += " ";
-                            outcome += "+";
-                            outcome += " ";
-                        }
+                        outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
                     }else{
-                        Nodo aux = list.getFirst();
+                        Nodo aux = actualNode.getNext();
+                        boolean control = false;
                         while(aux != null){
                             if(actualNode.getPower() == aux.getPower()){
-                                int diference = actualNode.getPower() - aux.getPower();
-                                outcome += diference+"x^"+actualNode.getPower();
-                                outcome += " ";
-                                outcome += "+";
-                                outcome += " ";
-                            }else{
-                                outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
+                                int difference = actualNode.getCoefficient() - aux.getCoefficient();
+                                outcome += difference+"x^"+actualNode.getPower();
+                                if(actualNode.getNext()!= null || aux.getNext()!=null){
+                                    outcome += " ";
+                                    outcome += "+";
+                                    outcome += " ";
+                                }
+                                control = true;
+                                list1.deleteNode(aux);
+                            }
+                            aux = aux.getNext();
+                        }
+                        if(!control){
+                            outcome += actualNode.getCoefficient()+"x^"+actualNode.getPower();
+                            if(actualNode.getNext()!=null){
                                 outcome += " ";
                                 outcome += "+";
                                 outcome += " ";
                             }
-                            aux = aux.getNext();
                         }
                     }
-                    doOperation(actualNode.getNext(),list,operating);
+                    doOperation(actualNode.getNext(),list1,operating);
                 }
                 break;
                 
             case "*":
-                boolean control = false;
-                
                 if(actualNode != null){
                     if(list.getSize() == 1){
                         int powerSum = actualNode.getPower() + list.getFirst().getPower();
                         int coefficientProduct = actualNode.getCoefficient() * list.getFirst().getCoefficient();
                         outcome += coefficientProduct+"x^"+powerSum;
-                        outcome += " ";
-                        outcome += "+";
-                        outcome += " ";
+                        if(actualNode.getNext() != null){
+                            outcome += " ";
+                            outcome += "+";
+                            outcome += " ";
+                        }
                     }else{
                         Nodo aux = list.getFirst();
                         while(aux != null){
@@ -228,31 +236,10 @@ public class Modelo
                             temporalList.addNode(coefficientProduct, powerSum);
                             aux = aux.getNext();
                         }
-                        control = true;
                     }
                     doOperation(actualNode.getNext(),list,operating);
                 }
-                
-                if(control == true){
-                    Nodo tmp = temporalList.getFirst();
-                    while(tmp != null){
-                        int totalSum = tmp.getCoefficient();
-                        Nodo aux = tmp.getNext();
-                        while(aux != null){
-                            if(tmp.getPower() == aux.getPower()){
-                                totalSum += aux.getCoefficient();
-                                Nodo aux2 = aux.getNext();
-                                temporalList.deleteNode(aux);
-                                aux = aux2;
-                            }
-                        }
-                        outcome += totalSum+"x^"+tmp.getCoefficient();
-                        outcome += " ";
-                        outcome += "+";
-                        outcome += " ";
-                        tmp = tmp.getNext();
-                    }
-                }
+                doOperation(temporalList.getFirst(), temporalList, "+");
                 break;
         
             case "/":
@@ -280,22 +267,43 @@ public class Modelo
         String[] split1 = polynomial1.split(" ");
         String[] split2 = polynomial2.split(" ");
         
-        for(int index = 0; index < split1.length; index++){
-            if(index > 0 && "-".equals(split1[index-1])){
-                String aux = "-"+split1[index];
-                split1[index] = aux;
+        if("+".equals(operating) || "-".equals(operating)){
+            
+            for(int index = 0; index < split1.length; index++){
+                if(index > 0 && "-".equals(split1[index-1])){
+                    String aux = "-"+split1[index];
+                    split1[index] = aux;
+                }
+                list1.addNodeMonomial(split1[index]);
+                index++;
             }
-            list1.addNodeMonomial(split1[index]);
-            index++;
-        }
+            
+            for(int index = 0; index < split2.length; index++){
+                if(index > 0 && "-".equals(split2[index-1])){
+                    String aux = "-"+split2[index];
+                    split2[index] = aux;
+                }
+                list1.addNodeMonomial(split2[index]);
+                index++;
+            }
+        }else{
+            for(int index = 0; index < split1.length; index++){
+                if(index > 0 && "-".equals(split1[index-1])){
+                    String aux = "-"+split1[index];
+                    split1[index] = aux;
+                }
+                list1.addNodeMonomial(split1[index]);
+                index++;
+            }
         
-        for(int index = 0; index < split2.length; index++){
-            if(index > 0 && "-".equals(split2[index-1])){
-                String aux = "-"+split2[index];
-                split2[index] = aux;
+            for(int index = 0; index < split2.length; index++){
+                if(index > 0 && "-".equals(split2[index-1])){
+                    String aux = "-"+split2[index];
+                    split2[index] = aux;
+                }
+                list2.addNodeMonomial(split2[index]);
+                index++;
             }
-            list2.addNodeMonomial(split2[index]);
-            index++;
         }
     }
         
@@ -307,7 +315,7 @@ public class Modelo
      * @return    the sum of x and y
      */
     public boolean writeOutcome(){
-        writer = new Escritor("Archivos/Resultado.txt");
+        Escritor writer = new Escritor("Archivos/Resultado.txt");
         boolean control = writer.write(polynomial1+"|"+operating+"|"+polynomial2+"|"+outcome+"\r\n");
         writer.close();
         return control;
